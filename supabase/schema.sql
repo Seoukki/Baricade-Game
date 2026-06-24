@@ -1,21 +1,16 @@
--- =============================================
--- BARRICADE GAME — Schema v3
--- Run this in Supabase SQL Editor (fresh install)
--- =============================================
-
+-- BARRICADE v3 — Run in Supabase SQL Editor
 DROP TABLE IF EXISTS game_states CASCADE;
-DROP TABLE IF EXISTS players     CASCADE;
-DROP TABLE IF EXISTS rooms       CASCADE;
+DROP TABLE IF EXISTS players CASCADE;
+DROP TABLE IF EXISTS rooms CASCADE;
 
 CREATE TABLE rooms (
   id               UUID         DEFAULT gen_random_uuid() PRIMARY KEY,
   code             VARCHAR(8)   UNIQUE NOT NULL,
-  status           VARCHAR(20)  DEFAULT 'waiting',   -- waiting | playing | finished
+  status           VARCHAR(20)  DEFAULT 'waiting',
   host_session_id  VARCHAR(120) NOT NULL,
-  is_public        BOOLEAN      DEFAULT TRUE,         -- show in public lobby
+  is_public        BOOLEAN      DEFAULT TRUE,
   created_at       TIMESTAMPTZ  DEFAULT NOW()
 );
-
 CREATE TABLE players (
   id           UUID         DEFAULT gen_random_uuid() PRIMARY KEY,
   room_id      UUID         REFERENCES rooms(id) ON DELETE CASCADE,
@@ -26,7 +21,6 @@ CREATE TABLE players (
   joined_at    TIMESTAMPTZ  DEFAULT NOW(),
   UNIQUE(room_id, session_id)
 );
-
 CREATE TABLE game_states (
   id               UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
   room_id          UUID        REFERENCES rooms(id) ON DELETE CASCADE UNIQUE,
@@ -41,22 +35,15 @@ CREATE TABLE game_states (
   winner           VARCHAR(10),
   updated_at       TIMESTAMPTZ DEFAULT NOW()
 );
-
--- Enable Realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE rooms;
 ALTER PUBLICATION supabase_realtime ADD TABLE players;
 ALTER PUBLICATION supabase_realtime ADD TABLE game_states;
-
--- Disable RLS for development
 ALTER TABLE rooms       DISABLE ROW LEVEL SECURITY;
 ALTER TABLE players     DISABLE ROW LEVEL SECURITY;
 ALTER TABLE game_states DISABLE ROW LEVEL SECURITY;
 
--- =============================================
--- MIGRATION from v1/v2 (if tables already exist)
--- Comment out DROP TABLE lines above, then run:
--- =============================================
+-- MIGRATION (if you have existing tables):
 -- ALTER TABLE rooms ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT TRUE;
--- ALTER TABLE game_states ADD COLUMN IF NOT EXISTS red_barricades  INT DEFAULT 10;
+-- ALTER TABLE game_states ADD COLUMN IF NOT EXISTS red_barricades INT DEFAULT 10;
 -- ALTER TABLE game_states ADD COLUMN IF NOT EXISTS blue_barricades INT DEFAULT 10;
 -- ALTER TABLE game_states DROP COLUMN IF EXISTS phase;
