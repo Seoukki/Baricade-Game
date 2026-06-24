@@ -1,15 +1,10 @@
 {
   "name": "barricade-game",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
-  },
+  "scripts": { "dev": "next dev", "build": "next build", "start": "next start" },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.7",
-    "html5-qrcode": "^2.3.8",
     "next": "14.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
